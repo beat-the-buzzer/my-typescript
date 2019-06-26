@@ -77,4 +77,20 @@
   };
   console.log(objSym[key1]);
   // console.log(objSym[key2]); // symbol不能作为索引
+
+  // const getLength = (target: string | number): number => {
+  //   if(target.length) { // 报错: Property 'length' does not exist on type 'string | number'.
+  //     return target.length;
+  //   } else {
+  //     return target.toString().length;
+  //   }
+  // }
+
+  const getStrLength = (target: string | number) : number => {
+    if ((<string> target).length) {
+      return (target as string).length; // tslint推荐语法，JSX中只能使用这种语法
+    } else {
+      return target.toString().length;
+    }
+  }
 }

@@ -164,3 +164,26 @@ const getLength = (content: string | number): number => {
 console.log(getLength(123)); // 3
 console.log(getLength('abc')); // 3
 ```
+
+9、使用类型断言
+
+```ts
+const getLength = (target: string | number): number => {
+	if(target.length) { // 报错: Property 'length' does not exist on type 'string | number'.
+		return target.length; // 报错
+	} else {
+		return target.toString().length;
+	}
+}
+```
+
+```ts
+const getStrLength = (target: string | number) : number => {
+	if ((<string> target).length) {
+		return (target as string).length; // tslint推荐语法，JSX中只能使用这种语法
+	} else {
+		return target.toString().length;
+	}
+}
+```
+
