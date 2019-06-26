@@ -22,7 +22,7 @@ TypeScript有各种各样的好处，但是在实际项目中使用的难度比�
 
 [2、TypeScript中的类型](https://github.com/beat-the-buzzer/typescript/tree/master/ts-type)
 
-
+[3、TypeScript中的接口](https://github.com/beat-the-buzzer/typescript/tree/master/ts-interface)
 
 
 
