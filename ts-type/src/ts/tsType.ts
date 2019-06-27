@@ -21,7 +21,9 @@
   // let myArr: MyArr = [0, '1', '3']; // 报错，数组越界
   let myArr: MyArr = [0, '1'];
   console.log(myArr.length);
+}
 
+{
   /**
   *  枚举类型
   */
@@ -38,7 +40,9 @@
   // }
   const superadmin = Roles['SUPER_ADMIN'];
   console.log(`超级管理员：${superadmin}`);
+}
 
+{
   /*
   * void
   */
@@ -47,7 +51,9 @@
     console.log(text);
   }
   consoleText('hello world');
+}
 
+{
   /*
   * never
   */
@@ -55,7 +61,9 @@
     throw new Error(msg);
   }
   // errorFunc('Syntax Error: You must be out of mind!')
+}
 
+{
   /*
   * 交叉类型
   */
@@ -72,12 +80,14 @@
   const info = merge(info1, info2);
   console.log(info); // info
   // console.log(info.country); // 报错: 不存在country属性
+}
 
+{
   /*
   * 联合类型
   */
   const getLength = (content: string | number): number => {
-    if(typeof content === 'string') {
+    if (typeof content === 'string') {
       return content.length;
     } else {
       return String(content).length;
@@ -85,4 +95,25 @@
   }
   console.log(getLength(123)); // 3
   console.log(getLength('abc')); // 3
+}
+
+{
+  /*
+  * 类型断言
+  */
+
+  // const getLength = (target: string | number): number => {
+  //   if(target.length) { // 报错: Property 'length' does not exist on type 'string | number'.
+  // 	  return target.length; // 报错
+  //   } else {
+  // 	  return target.toString().length;
+  //   }
+  // }
+  const getStrLength = (target: string | number): number => {
+    if ((<string>target).length) {
+      return (target as string).length; // tslint推荐语法，JSX中只能使用这种语法
+    } else {
+      return target.toString().length;
+    }
+  }
 }

@@ -95,23 +95,31 @@ interface MyArr extends Array<number | string> {
 
 ```ts
 enum Roles {
-	SUPER_ADMIN, // 默认0
-	ADMIN,
-	USER
+  SUPER_ADMIN, // 默认0
+  ADMIN,
+  USER
 }
+// 等价于
+// enum Roles {
+//   SUPER_ADMIN = 0, // 默认0
+//   ADMIN = 1,
+//   USER = 2
+// }
 const superadmin = Roles['SUPER_ADMIN'];
 console.log(`超级管理员：${superadmin}`);
 ```
 
 3、any
 
-> 如果任何值都指定为any，那么typescript将失去它的意义
+如果任何值都指定为any，那么typescript将失去它的意义
 
 4、void
 
 ```ts
-const consoleText = (text: string): void => {
-	console.log(text);
+enum Roles {
+  SUPER_ADMIN, // 默认0
+  ADMIN,
+  USER
 }
 ```
 
@@ -119,7 +127,7 @@ const consoleText = (text: string): void => {
 
 ```ts
 const errorFunc = (msg: string): never => {
-	throw new Error(msg);
+  throw new Error(msg);
 }
 ```
 
@@ -137,14 +145,14 @@ const errorFunc = (msg: string): never => {
 
 ```ts
 const merge = <T, U>(arg1: T, arg2: U): T & U => {
-	let res = Object.assign({}, arg1, arg2);
-	return res;
+  let res = Object.assign({}, arg1, arg2);
+  return res;
 }
 const info1 = {
-	name: 'John'
+  name: 'John'
 };
 const info2 = {
-	age: 20
+  age: 20
 };
 const info = merge(info1, info2);
 console.log(info); // info
@@ -155,11 +163,11 @@ console.log(info.country); // 报错: 不存在country属性
 
 ```ts
 const getLength = (content: string | number): number => {
-	if(typeof content === 'string') {
-		return content.length;
-	} else {
-		return String(content).length;
-	}
+  if(typeof content === 'string') {
+    return content.length;
+  } else {
+    return String(content).length;
+  }
 }
 console.log(getLength(123)); // 3
 console.log(getLength('abc')); // 3
@@ -169,21 +177,21 @@ console.log(getLength('abc')); // 3
 
 ```ts
 const getLength = (target: string | number): number => {
-	if(target.length) { // 报错: Property 'length' does not exist on type 'string | number'.
-		return target.length; // 报错
-	} else {
-		return target.toString().length;
-	}
+  if(target.length) { // 报错: Property 'length' does not exist on type 'string | number'.
+    return target.length; // 报错
+  } else {
+    return target.toString().length;
+  }
 }
 ```
 
 ```ts
-const getStrLength = (target: string | number) : number => {
-	if ((<string> target).length) {
-		return (target as string).length; // tslint推荐语法，JSX中只能使用这种语法
-	} else {
-		return target.toString().length;
-	}
+const getStrLength = (target: string | number): number => {
+  if ((<string>target).length) {
+    return (target as string).length; // tslint推荐语法，JSX中只能使用这种语法
+  } else {
+    return target.toString().length;
+  }
 }
 ```
 
