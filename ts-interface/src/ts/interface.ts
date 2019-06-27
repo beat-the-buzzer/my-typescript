@@ -59,3 +59,48 @@
   getNickName({ lastName: 'James' }); // 正常
   getNickName({ lastName: 'James', age: 20 }); // 使用了索引签名，不会报错
 }
+
+// 只读属性
+{
+  interface Role {
+    readonly 0: string,
+    readonly 1: string
+  }
+  const role: Role = {
+    0: 'Super_Admin',
+    1: 'Admin'
+  };
+  // role[1] = 'Top_Admin'; // 报错 这是只读属性，不可以修改
+}
+
+// 只读属性和const
+{
+  const NAME: string = 'John';
+  // NAME = ''; // 报错，不允许修改常量
+  const obj = {
+    name: 'John'
+  };
+  obj.name = 'Junes'; // 操作属性 不会报错
+
+  interface Info {
+    readonly name: string
+  }
+
+  const info: Info = {
+    name: 'John'
+  };
+  // info.name = 'Junes'; // 报错 不可以修改只读属性
+}
+
+// 使用接口描述函数
+{
+  interface AddFunc {
+    (num1: number, num2: number): number;
+  }
+  const add: AddFunc = (n1, n2) => n1 + n2;
+  // add(1); // 报错
+  // add(1, 2, 3); // 报错
+  // add(1, '2'); // 报错
+  add(1, 2); // 正确
+  // const join: AddFunc = (n1, n2) => `${n1}${n2}`; // 报错 返回值是string
+}

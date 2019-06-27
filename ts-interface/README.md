@@ -1,5 +1,9 @@
 ### Typescript接口
 
+JS代码在浏览器里面运行的都时候，最好把{}带上，给代码块增加作用域限制（ES6写法）。
+
+TS每个代码块都加了{}，解决了let、const重复的问题。
+
 > 使用接口可以定义几乎任意结构。
 
 #### 为什么使用接口
@@ -106,4 +110,38 @@ getNickName({ lastName: 'James', age: 20 }); // 使用了索引签名，不会�
 ```
 
 #### 只读属性
+
+```ts
+const NAME: string = 'John';
+NAME = ''; // 报错，不允许修改常量
+const obj = {
+  name: 'John'
+};
+obj.name = 'Junes'; // 操作属性 不会报错
+
+interface Info {
+  readonly name: string
+}
+
+const info: Info = {
+  name: 'John'
+};
+info.name = 'Junes'; // 报错 不可以修改只读属性
+```
+
+#### 描述函数
+
+```ts
+interface AddFunc {
+  (num1: number, num2: number): number;
+}
+const add: AddFunc = (n1, n2) => n1 + n2;
+add(1); // 报错
+add(1, 2, 3); // 报错
+add(1, '2'); // 报错
+add(1, 2); // 正确
+const join: AddFunc = (n1, n2) => `${n1}${n2}`; // 报错 返回值是string
+```
+
+AddFunc结构，必须包含一个和结构里定义的函数一样参数、一样返回值的方法，或者这个值就是符合这个函数要求的函数。花括号里面的叫做`调用签名`。
 
