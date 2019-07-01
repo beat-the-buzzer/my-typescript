@@ -147,7 +147,7 @@ AddFunc结构，必须包含一个和结构里定义的函数一样参数、一�
 
 #### 接口的高级用法
 
-索引类型
+1、索引类型
 
 ```ts
 interface RoleDic {
@@ -164,7 +164,7 @@ const role2: RoleDic = {
 const role3: RoleDic = ['admin', 'super_admin']; // 不会报错
 ```
 
-继承接口
+2、继承接口
 
 原先的需求：
 
@@ -223,7 +223,7 @@ const tomato: Tomato = {
 };
 ```
 
-混合类型接口
+3、混合类型接口
 
 把函数赋值给countUp，并且在上面绑定一个属性。
 
@@ -256,4 +256,103 @@ counter();
 console.log(counter.count); // 2
 ```
 
+#### 为函数和函数参数定义类型
 
+1、为函数定义类型
+
+```ts
+// 正常定义函数
+function add(arg1: number, arg2: number): number {
+  return arg1 + arg2
+}
+// 或者
+const add = (arg1: number, arg2: number): number => arg1 + arg2;
+```
+
+```ts
+// 使用接口定义函数
+interface Add {
+  (x: number, y: number): number
+}
+let add: Add = (arg1, arg2) => arg1 + arg2;
+add(1,'2'); // 报错 类型不对
+add(1, 2, 3); // 报错，参数数量不对
+add(1, 2); // 3
+```
+
+```ts
+// 使用类型别名
+type Add = (x: number, y: number) => number;
+let add: Add = (args1: string, args2: string):string => args1 + args2; // 报错，类型错误
+let add: Add = (arg1: number, arg2: number) => arg1 + arg2;
+add(1,'2'); // 报错 类型不对
+add(1, 2, 3); // 报错，参数数量不对
+add(1, 2); // 3
+```
+
+2、为函数的参数定义类型
+
+ - 可选参数（注意位置）
+
+ ```ts
+ type Add = (x?: number, y: number) => number; // 报错，必选参数不能位于可选参数后面
+ ```
+
+ - 默认参数 
+
+  ES6之前，我们都是在函数内部判断有没有传参数，如果没传，就给一个默认值。ES6提供了更加优雅的方式实现：
+
+  ```js
+  const count = 0;
+  const countUp = (step = 1) => {
+    count+= step;
+  }
+  ```
+
+  TS会识别默认参数的类型，也就是类型推论：
+
+  ```ts
+  const add = (x: number, y = 2): number => x + y;
+  add(1, '2'); // 报错，类型不对
+  ```
+
+ - 剩余参数
+  
+  下面的例子，传入不同数量参数，进行不同的操作：
+
+  ```js
+  // ES5
+  function handleData() {
+    if (arguments.length === 1) {
+      return arguments[0] * 2;
+    } else if (arguments.length === 2) {
+      return arguments[0] * arguments[1];
+    } else {
+      return [].slice.call(arguments).join('_');
+    }
+  }
+  handleData(2); // 4
+  handleData(2, 3); // 6
+  handleData(1, 2, 3, 4, 5); // '1_2_3_4_5'
+  ```
+
+  ```js
+  // ES6
+  const handleData = (arg1, ...args) => {
+    // ... 省略逻辑
+  }
+  handleData(1, 2, 3, 4, 5); // '1_2_3_4_5'
+  ```
+
+  ```ts
+  const handleData = (arg1: number, ...args: number[]) => {
+    if (args.length === 0) {
+      return arg1 * 2;
+    } else if (args.length === 1) {
+      return arg1 * args[0];
+    } else {
+      return [arg1, ...args].join('_');
+    }
+  }
+  handleData(1, 2, 3, 4, 5); // '1_2_3_4_5'
+  ```
