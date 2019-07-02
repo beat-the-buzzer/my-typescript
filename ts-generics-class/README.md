@@ -68,3 +68,85 @@ getArray(1,'a',3).forEach(item => {
 
 3、泛型函数类型
 
+泛型函数类型，简单定义
+
+```ts
+const getArray: <T>(arg: T, times: number) => T[] = (arg, times) => {
+  return Array(times).fill(arg);
+}
+```
+
+泛型函数类型，使用类型别名
+
+```ts
+type GetArray = <T>(ars: T, times: number) => T[];
+const getArray: GetArray = <T>(arg: T, times: number): T[] => {
+  return Array(times).fill(arg);
+}
+```
+
+接口的形式定义泛型函数
+
+```ts
+interface GetArray {
+  <T>(arg: T, times: number): T[]
+}
+const getArray: GetArray = <T>(arg: T, times: number): T[] => {
+  return Array(times).fill(arg);
+}
+```
+
+泛型变量提到最外层
+
+```ts
+interface GetArray<T> {
+  (arg: T, times: number): T[];
+}
+const getArray: GetArray<number> = <T>(arg: T, times: number): T[] => {
+  return Array(times).fill(arg);
+}
+getArray('a',1); // 报错，不能将类型"a"分配给number
+```
+
+4、泛型约束
+
+我们使用泛型的时候，是把它当做any来使用的，所以有时候起不到约束类型的作用。我们可以约束泛型，例如，限制T必须要有length属性。
+
+```ts
+interface ValueWithLength {
+  length: number;
+}
+const v: ValueWithLength = {}; // 报错，空对象没有length属性
+const val: ValueWithLength = 'abc'; // 正常，字符串有length属性
+const getLength = <T extends ValueWithLength>(param: T): number => {
+  return param.length;
+}
+getLength('abc');
+getLength(123); // 报错
+getLength({length: 3});
+getLength([1,2,3]);
+```
+
+泛型约束中使用类型参数
+
+我们有时候访问了对象上不存在的属性
+
+```js
+const getProps = (obj, props) => {
+  return obj[props];
+}
+const obj = { a: 'aa', b: 'bb' };
+getProps(obj, 'c'); // undefined
+```
+
+我们可以对其检查：
+
+```ts
+const getProps = <T, K extends keyof T>(obj: T, props: K) => {
+  return obj[props];
+}
+const obj = { a: 'aa', b: 'bb' };
+getProps(obj, 'c'); // 报错
+```
+
+#### TS中的类

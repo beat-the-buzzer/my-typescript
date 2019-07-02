@@ -35,7 +35,7 @@
 
 // 多个泛型变量的情况
 {
-  const getArray = <T,U>(param1: T, param2: U, times: number): [T, U][] => {
+  const getArray = <T, U>(param1: T, param2: U, times: number): [T, U][] => {
     return Array(times).fill([param1, param2]);
   }
   // getArray(1,'a',3).forEach(item => {
@@ -49,4 +49,60 @@
   const getArray: <T>(arg: T, times: number) => T[] = (arg, times) => {
     return Array(times).fill(arg);
   }
+}
+
+// 泛型函数类型，使用类型别名
+{
+  type GetArray = <T>(ars: T, times: number) => T[];
+  const getArray: GetArray = <T>(arg: T, times: number): T[] => {
+    return Array(times).fill(arg);
+  }
+}
+
+// 使用接口的形式定义泛型函数类型
+{
+  interface GetArray {
+    <T>(arg: T, times: number): T[]
+  }
+  const getArray: GetArray = <T>(arg: T, times: number): T[] => {
+    return Array(times).fill(arg);
+  }
+}
+
+// 泛型变量提到最外层
+{
+  interface GetArray<T> {
+    (arg: T, times: number): T[];
+  }
+  const getArray: GetArray<number> = <T>(arg: T, times: number): T[] => {
+    return Array(times).fill(arg);
+  }
+  // getArray('a',1); // 报错，不能将类型"a"分配给number
+  // 使用接口的时候，去定义类型 ： 77行
+}
+
+// 泛型约束
+{
+  interface ValueWithLength {
+    length: number;
+  }
+  // const v: ValueWithLength = {}; // 报错，空对象没有length属性
+  const val: ValueWithLength = 'abc'; // 正常，字符串有length属性
+
+  const getLength = <T extends ValueWithLength>(param: T): number => {
+    return param.length;
+  }
+  getLength('abc');
+  // getLength(123); // 报错
+  getLength({ length: 3 });
+  getLength([1, 2, 3]);
+}
+
+// 泛型约束中使用类型参数
+{
+  const getProps = <T, K extends keyof T>(obj: T, props: K) => {
+    return obj[props];
+  }
+  const obj = { a: 'aa', b: 'bb' };
+  // getProps(obj, 'c'); // 报错
 }

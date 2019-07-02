@@ -24,5 +24,5 @@ TypeScript有各种各样的好处，但是在实际项目中使用的难度比�
 
 [3、TypeScript中的接口](https://github.com/beat-the-buzzer/typescript/tree/master/ts-interface)
 
-
+[4、TypeScript中的泛型和类](https://github.com/beat-the-buzzer/typescript/tree/master/ts-generics-class)
 
