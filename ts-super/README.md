@@ -110,5 +110,123 @@ let func = merge;
 func = sum; // error:不能将类型“string”分配给类型“number”
 ```
 
+#### 类型保护
 
+1、使用类型断言
+
+```ts
+const valueList = [123, 'abc'];
+const getRandomValue = () => {
+  const number = Math.random() * 10; // 取一个0到10范围内的随机值
+  if(number < 5) {
+    return valueList[0];
+  } else {
+    return valueList[1];
+  }
+}
+const item = getRandomValue();
+if(item.length != null) {
+  console.log(item.length);
+} else {
+  console.log(item.toFixed());
+}
+```
+
+上面代码的逻辑在js里面是没有问题的，如果item没有length属性，就把它当做数字类型处理。不过这段代码在ts中会报错。类型“string | number”上不存在属性“length”
+
+我们在前面可以使用类型断言的方式解决这个问题：
+
+```ts
+if((<string>item).length != null) {
+  console.log((<string>item).length);
+} else {
+  console.log(item)
+}
+```
+
+2、自定义类型保护
+
+如果每个地方都使用类型断言，就会有很多冗余，我们可以使用更加优雅的方式实现类型保护。
+
+```ts
+const valueList = [123, 'abc'];
+const getRandomValue = () => {
+  const value = Math.random()* 10;
+  if(value < 5) {
+    return valueList[0];
+  } else {
+    return valueList[1];
+  }
+}
+function isString(value: number | string): value is string {
+  return typeof value === 'string'
+}
+const item = getRandomValue();
+if(isString(item)) {
+  console.log(item.length);
+} else {
+  console.log(item.toFixed());
+}
+```
+
+`value is string`叫做类型谓语，value的名字要和参数名保持一致。函数的返回值是一个boolean类型，如果为true，表示传入的值的类型是is后面的type。
+
+3、typeof类型保护
+
+在TS中国，如果是基本类型，我们可以直接使用typeof做类型判断。
+
+```ts
+if(typeof item === 'string') {
+  console.log(item.length);
+} else {
+  console.log(item.toFixed());
+}
+```
+
+在TS中，使用typeof还有一些特殊的前提：
+
+ - 只能使用等于或者不等于来比较
+ - type只能是number、string、boolean和symbol
+
+ ```ts
+const valueList = [{}, () => {}];
+const getRandomValue = () => {
+  const number = Math.random() * 10;
+  if(number < 5) {
+    return valueList[0];
+  } else {
+    return valueList[1];
+  }
+}
+const res = getRandomValue();
+if(typeof res === 'object') {
+  console.log(res.toString());
+} else {
+  console.log(res()); // 报错 无法调用类型缺少调用签名的表达式。类型“{}”没有兼容的调用签名。
+}
+ ```
+
+ 4、instanceof类型保护
+
+ instanceof操作符是JS中的原生操作符，用来判断一个实例是不是某个构造函数创建的，或者是不是使用ES6语法的某个类创建的。TS中可以用来做类型保护。
+
+```ts
+ class CreateByClass1 {
+  public age = 18;
+  constructor() { }
+}
+class CreateByClass2 {
+  public name = 'James';
+  constructor() { }
+}
+function getRandomItem() {
+  return Math.random() < 0.5 ? new CreateByClass1() : new CreateByClass2();
+}
+const citem = getRandomItem();
+if (citem instanceof CreateByClass1) {
+  console.log(citem.age);
+} else {
+  console.log(citem.name);
+}
+```
 

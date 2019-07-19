@@ -18,6 +18,8 @@ TypeScript有各种各样的好处，但是在实际项目中使用的难度比�
 
 三大框架已经或者即将支持TypeScript，说明TypeScript已经被广泛接受。
 
+> 下面的例子，几乎每一个都是放在{}里面的。但是，由于在面向 "ES3" 或 "ES5" 时，在严格模式下，块内不允许函数声明，有少部分代码没有使用{}，这样，在同一个文件写例子或者文件引用的时候，主要变量名是否有冲突。
+
 [1、TypeScript环境搭建](https://github.com/beat-the-buzzer/typescript/tree/master/ts-env)
 
 [2、TypeScript中的类型](https://github.com/beat-the-buzzer/typescript/tree/master/ts-type)
