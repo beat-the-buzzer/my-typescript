@@ -230,3 +230,71 @@ if (citem instanceof CreateByClass1) {
 }
 ```
 
+#### 显式赋值断言
+
+关于null和undefined：
+
+1、null和undefined赋值给其他类型
+
+```ts
+let str = 'James';
+str = null; // error: 不能将类型“null”分配给类型“string”。
+let strNull: string | null = 'James';
+strNull = null;
+strNull = undefined; // error: 不能将类型“undefined”分配给类型“string | null”。
+```
+
+2、可选参数和可选属性
+
+如果在tsconfig.json里面配置了`"strictNullChecks": true`，可选参数会被自动加上`|undefined`
+
+```ts
+const sum = (x: number, y?: number) => {
+  return x + (y || 0);
+};
+sum(1, 2); // 3
+sum(1); // 1
+sum(1, undefined); // 1
+sum(1, null);// error:类型“null”的参数不能赋给类型“number | undefined”的参数。
+```
+
+从上面的例子可以看出，y作为可选参数，它的类型就不仅仅是number了，而是number和undefined的联合类型。
+
+对可选属性也是类似的操作：
+
+```ts
+interface PositionInterface {
+  x: number;
+  y?: number;
+}
+const position: PositionInterface = {
+  x: 12
+};
+// position.y = 'abc'; // error: 不能将类型“"abc"”分配给类型“number | undefined”。
+position.y = undefined; // 正常
+// position.y = null; // error: 不能将类型“null”分配给类型“number | undefined”
+```
+
+当我们开启`strictNullChecks`的时候，有些情况下编译器无法在我们声明变量之前知道一个值是否为null，所以需要使用类型断言手动指明该值不为null。
+
+```ts
+function getSplicedStrError(num: number | null): string {
+  function getRes(prefix: string) {
+    return prefix + num.toFixed(); // error 对象可能为 "null"。
+  }
+  num = num || 0.1;
+  return getRes('James');
+}
+```
+
+因为有嵌套函数，编译器无法去除嵌套函数的null，所以需要使用显式赋值断言：
+
+```ts
+function getSplicedStr(num: number | null): string {
+  function getRes(prefix: string) {
+    return prefix + num!.toFixed(); // 使用显式赋值断言
+  }
+  num = num || 0.1;
+  return getRes('James');
+}
+```
