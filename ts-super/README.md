@@ -298,3 +298,103 @@ function getSplicedStr(num: number | null): string {
   return getRes('James');
 }
 ```
+
+#### 类型别名和字面量类型
+
+1、类型别名
+
+类型别名就是给类型起一个其它的名字，之后要用到这个类型的地方，都可以使用这个名字来代替。
+
+```ts
+// 类型别名
+type TypeString = string;
+let str: TypeString;
+str = 123; // error： 不能将类型“123”分配给类型“string”
+str = 'abc';
+```
+
+```ts
+// 泛型
+type PositionType<T> = {
+  x: T,
+  y: T
+};
+const position1: PositionType<number> = {
+  x: 1,
+  y: -1
+};
+const position2: PositionType<string> = {
+  x: 'left',
+  y: 'top'
+};
+```
+
+```ts
+// 接口和类型别名
+type Alias = {
+  num: number;
+}
+interface Interface {
+  num: number;
+}
+let aliasDemo: Alias = {
+  num: 0
+};
+let interfaceDemo: Interface = {
+  num: 0
+};
+aliasDemo = interfaceDemo; // 可以互相赋值
+```
+
+2、字面量类型
+
+注意字符串字面量类型和字符串类型的区别。
+
+字符串字面量类型就是字符串常量，是具体的值：
+
+```ts
+type Name = 'James';
+const name1: Name = 'ts'; // 报错 不能将类型“"ts"”分配给类型“"James"”
+const name2: Name = 'James'; // 正常
+```
+
+可以使用联合类型来使用多个字符串：
+
+```ts
+type Direction = 'north' | 'east' | 'south' | 'west';
+var getDirectionPrefix = function(direction: Direction) {
+  return direction[0].toUpperCase();
+}
+getDirectionPrefix('test'); // 报错 类型“"test"”的参数不能赋给类型“Direction”的参数
+getDirectionPrefix('west'); // W
+```
+
+数字字面量类型也是具体的值：
+
+```ts
+type Age = 18;
+interface Info {
+  name: string,
+  age: Age
+};
+const info: Info = {
+  name: 'James',
+  // age: 20 // 报错 不能将类型“20”分配给类型“18”
+  age: 18
+}
+```
+
+有一个常见的逻辑错误：
+
+```ts
+var getValue = function(index: number) {
+  if(index !== 0 || index !== 1) { 
+    // his condition will always return 'true' since the types '0' and '1' have no overlap.
+    // do something
+  }
+}
+```
+
+当index!==0不成立时，说明index就是常量0，此时后面的判断没有意义；当index!==0成立时，后面不会去进行判断。
+
+值得一提的是，这一类错误只有TS中会提醒你，如果是JS，你只有把项目跑起来才能知道你写得有问题。
