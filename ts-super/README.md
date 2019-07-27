@@ -398,3 +398,75 @@ var getValue = function(index: number) {
 当index!==0不成立时，说明index就是常量0，此时后面的判断没有意义；当index!==0成立时，后面不会去进行判断。
 
 值得一提的是，这一类错误只有TS中会提醒你，如果是JS，你只有把项目跑起来才能知道你写得有问题。
+
+#### 可辨识联合
+
+我们可以把单例类型（符合单例模式的数据类型，例如字面量类型）、联合类型、类型保护和类型别名这几种类型合并，来创建一个叫做`可辨识类型`的高级类型。
+
+可辨识联合类型有两个要素：
+
+ - 具有普通的单例类型属性（重要因素）
+ - 一个类型别名，包含了那些类型的联合，即把几个类型封装为联合类型，并起一个别名
+
+例子如下：
+
+```ts
+interface Square {
+  kind: 'square'; // 具有辨识性的属性
+  size: number
+}
+interface Rectangle {
+  kind: 'rectangle'; // 具有辨识性的属性
+  height: number;
+  width: number
+}
+interface Circle {
+  kind: 'circle'; // 具有辨识性的属性
+  radius: number
+}
+type Shape = Square | Rectangle | Circle; // 三个接口组成一个联合类型，使用别名Square
+var getArea = function(s: Shape): number{
+  switch (s.kind) {
+    case 'square': 
+      return s.size * s.size;
+    case 'rectangle':
+      return s.height * s.width;
+    case 'circle':
+      return Math.PI * s.radius * s.radius;
+  }
+}
+```
+
+我们对每一种情况都进行详细的操作，但是，如果我们少写一个case，编辑器应该报错提醒，但是目前来看，没有。我们可以使用strictNullChecks，如果我们在上面的case里没有处理circle，就会返回undefined。不过这种方法是在2.0版本中新增的，对于旧版本可能无法支持。
+
+```ts
+// 把上面的case circle注释掉，就会报错
+getArea({
+  kind: 'circle',
+  radius: 5
+});
+```
+
+我们可以使用never类型来解决这个问题。
+
+```ts
+var assertNever = function (value: never) {
+  throw new Error('Unexpected object: ' + value)
+};
+var getArea = function(s: Shape): number {
+  switch (s.kind) {
+    case 'square':
+      return s.size * s.size;
+    case 'rectangle':
+      return s.height * s.width;
+    case 'circle':
+      return Math.PI * s.radius * s.radius;
+    default: 
+      return assertNever(s); // error
+  };
+}
+```
+
+使用这种方式，需要定义一个额外的assertNever函数，这种方法在编译和运行阶段都会进行遗漏提示。
+
+
