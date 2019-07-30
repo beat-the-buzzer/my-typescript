@@ -469,4 +469,94 @@ var getArea = function(s: Shape): number {
 
 使用这种方式，需要定义一个额外的assertNever函数，这种方法在编译和运行阶段都会进行遗漏提示。
 
+#### 索引类型
 
+1、索引类型查询操作符
+
+```ts
+interface Info {
+  name: string;
+  age: number
+}
+let infoProp: keyof Info;
+infoProp = 'name';
+infoProp = 'age';
+infoProp = 'sex'; // 报错：不能将类型“"sex"”分配给类型“"name" | "age"”
+```
+
+这里的`keyof Info`就相当于`name | age`。
+
+和泛型结合使用，就可以检查使用动态属性的代码：
+
+```ts
+// 和泛型结合使用
+function getValueTest<T, K extends keyof T>(obj: T, names: K[]): T[K][] {
+  return names.map(v => obj[v])
+}
+const info = {
+  name: 'James',
+  age: 18
+};
+let value: string[] = getValueTest(info, ['name']);
+value = getValueTest(info, ['age']); // 报错 不能将类型“number”分配给类型“string”
+```
+
+2、索引访问操作符
+
+索引访问操作符和JS的一样，但是在TS中，可以用来访问某个属性的类型。
+
+```ts
+interface Info {
+  name: string,
+  age: number
+};
+type NameType = Info['name'];
+let name: NameType = 123; // 报错：不能将类型“123”分配给类型“string”
+```
+
+再看一个例子：
+
+```ts
+function getProperty<T, K extends keyof T>(o: T, name: K): T[K] {
+  return o[name];
+}
+```
+
+这个函数中，两个参数的类型分别是泛型T和K，函数返回值类型是T[K]。
+
+最后看一个结合接口的例子：
+
+```ts
+interface Obj<T> {
+  [key: number]: T
+}
+let key: keyof Obj<number>;
+```
+
+> 如果接口的索引类型是number，那么实现这个接口的对象的属性名必须是number类型，如果索引类型是string，对象的属性名可以是number，也可以是string
+
+```ts
+interface Obj<T> {
+  [key: string]: T
+}
+const obj: Obj<number> = {
+  age: 18
+};
+let value: Obj<number>['age'];
+```
+
+当tsconfig.json里的`strictNullChecks`设为false时，通过Type[keyof Type]获取到的类型，是除去never & undefined & null三种类型之外的字段值类型的联合类型。
+
+```ts
+interface Type {
+  a: never;
+  b: never;
+  c: string;
+  d: number;
+  e: undefined;
+  f: null;
+  g: object
+};
+type test = Type[keyof Type];
+// test的类型是string | number | object
+```

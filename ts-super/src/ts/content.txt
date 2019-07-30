@@ -3,4 +3,5 @@ type-compat.ts => 类型兼容性
 type-protectd.ts => 类型保护
 explicit-assign-assert.ts => 显式赋值断言
 type-alias => 类型别名
-discriminated-unions=> 可辨识联合
+discriminated-unions => 可辨识联合
+type-index => 索引类型
