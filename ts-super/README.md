@@ -560,3 +560,146 @@ interface Type {
 type test = Type[keyof Type];
 // test的类型是string | number | object
 ```
+
+#### 映射类型
+
+假设我们有一个Info接口，里面有一个age属性；我们还想定义一个接口，让age属性只读。显然，重新定义一个接口是可行的，但是如果属性比较多，就很麻烦，我们可以使用映射类型：
+
+```ts
+interface Info {
+  age: number
+}
+interface InfoReadonly {
+  readonly age: number
+}
+type ReadonlyType <T> = {
+  readonly [P in keyof T]: T[P]
+}
+type ReadonlyInfo = ReadonlyType<Info>;
+var myInfo: ReadonlyInfo = {
+  age: 18
+};
+myInfo.age = 19; // 报错： Cannot assign to 'age' because it is a read-only property
+```
+
+TS中使用for in定义映射类型，涉及到三个部分：
+
+1. 类型变量，也就是上面的P，就想for in循环中的变量一样，绑定当前变量元素的属性值
+
+2. 属性名联合，也就是keyof T，返回对象T的属性名联合
+
+3. 属性的结果类型，也就是T[P]
+
+TS中内置了几种映射类型，分别是Readonly、Partial、Pick、Record。
+
+简单使用一下Pick：
+
+```ts
+interface Info {
+  name: string,
+  age: number,
+  address: string
+}
+const info: Info = {
+  name: 'James',
+  age: 18,
+  address: 'Shanghai'
+};
+var pick = function pick<T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+  let res = {} as Pick<T, K>;
+  keys.forEach(key => {
+    res[key] = obj[key]
+  });
+  return res;
+};
+const nameAndAddress = pick(info, ['name', 'address']);
+```
+
+简单使用一下Recond：
+
+```ts
+const mapObj = function mapObj<K extends string | number, T, U>(
+  obj: Record<K, T>, 
+  f: (x: T) => U
+): Record<K, U> {
+  let res = {} as Record<K, U>;
+  for(let key in obj) {
+    res[key] = f(obj[key]);
+  }
+  return res;
+};
+const names = {
+  0: 'hello',
+  1: 'world',
+  2: 'bye'
+};
+const lengths = mapObj(names, s => s.length);
+```
+
+同态的概念：两个相同类型的代数结构之间的结构保持映射。根据上面的例子，Record不是同态的，因为Record映射出来的对象属性值是新的，和输入的值的属性值不同。
+
+类型映射也可以逆向操作，也就是拆包。
+
+```ts
+type Proxy<T> = {
+  get(): T,
+  set(value: T): void
+}; // 定义一个映射类型
+type Proxify<T> = {
+  [P in keyof T]: Proxy<T[P]>;
+}; // 再定义一个映射类型，将对象的属性值类型都变成Proxy处理后的类型
+var proxify = function proxify<T>(obj: T): Proxify<T> {
+  let result = {} as Proxify<T>;
+  for(let key in obj) {
+    result[key] = {
+      get: () => obj[key],
+      set: (value) => obj[key] = value
+    };
+  }
+  return result;
+};
+
+let props = {
+  name: 'James',
+  age: 18
+};
+let proxyProps = proxify(props);
+console.log(proxyProps.name.get()); // James
+proxyProps.age.set(20);
+
+// 拆包操作
+var unproxify = function unproxify<T>(t: Proxify<T>): T {
+  let result = {} as T;
+  for(let i in t) {
+    result[i] = t[i].get();
+  }
+  return result;
+};
+let originalProps = unproxify(proxyProps);
+```
+
+添加或者移除修饰符：
+
+```ts
+interface Info {
+  name: string,
+  age: number
+}
+type ReadonlyInfo<T> = {
+  +readonly [P in keyof T] +?: T[P]
+};
+let info: ReadonlyInfo<Info> = {
+  name: 'James'
+};
+// info.name = ''; // 报错 只读属性
+
+type RemoveModifier<T> = {
+  -readonly [P in keyof T] -?: T[P]
+};
+type InfoType = RemoveModifier<Readonly<Partial<Info>>>;
+let info1: InfoType = {
+  name: 'James', // 这一项不再是Readonly
+  age: 23, // 这一项已经是必输项，不是可选项
+};
+info1.name = ''; // 没有报错，
+```
