@@ -703,3 +703,88 @@ let info1: InfoType = {
 };
 info1.name = ''; // 没有报错，
 ```
+
+#### unknown类型
+
+1. 任何类型的值都可以赋值给unknown类型
+
+```ts
+let value: unknown;
+value = 'a';
+value = 123;
+```
+
+2. 如果没有类型断言或基于控制流的类型细化时unknown不可以赋值给其他类型，此时只能赋值给unknown或者any
+
+```ts
+let value2: unknown;
+let value3: string = value2; // error 不能将类型’unknown‘分配给；类型string
+```
+
+3. 如果没有类型断言或者基于控制流的类型细化，则不能在它上面进行任何操作
+
+```ts
+let value: unknown;
+value += 1; // error 对象的类型为unknown
+```
+
+4. unknown 与任何其他类型组成的交叉类型，最后都是其他类型
+
+```ts
+type type1 = unknown & string; // type1 => string
+type type2 = number & unknown; // type2 => number
+type type3 = unknown  & unknown; // type3 => unknown
+type type4 = unknown & string[]; // type4 => string[]
+```
+
+5. unknown 与任何其他类型组成的联合类型，都是unknown类型，除了any。unknown 和 any组成的联合类型是any
+
+```ts
+type type1 = unknown | string; // type1 => unknown
+type type2 = number | unknown; // type2 => unknown
+type type3 = unknown  | any; // type3 => any
+type type4 = unknown | string[]; // type4 => unknown
+```
+
+6. never 类型是 unknown类型的子类型
+
+```ts
+type type1 = never extends unknown ? true : false; // true
+```
+
+7. keyof unknown等于类型never
+
+```ts
+type type1 = keyof unknown; // never
+```
+
+8. 只能对unknown进行等或不等操作，不能进行其他操作
+
+```ts
+let value1: unknown;
+value1 = 'abc';
+let value2: unknown;
+value2 = '123';
+value1 === value2;
+value1 !== value2;
+value1 += value2; // error Object is of type 'unknown'
+```
+
+9. unknown类型的值不能访问其属性、作为函数调用和作为类创建实例
+
+```ts
+let value5: unknown;
+value5.age; // error
+value5(); // error
+new value5(); // error
+```
+
+10. 使用映射类型时如果遍历的是unknown类型，则不会映射任何属性
+
+```ts
+type Types<T> = { [P in keyof T]: number };
+type type1 = Types<any>; // {[x: string: number]}
+type type2 = Types<unknown>; // {}
+```
+
+any类型，可以在这个值上做任意操作，而unknown类型不允许在没有类型断言或者基于控制流的类型细化时对unknown类型的值进行操作

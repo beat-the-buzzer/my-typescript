@@ -6,3 +6,4 @@ type-alias => 类型别名
 discriminated-unions => 可辨识联合
 type-index => 索引类型
 type-mapping => 映射类型
+type-unknown => 未知类型
